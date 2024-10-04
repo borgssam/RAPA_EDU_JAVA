@@ -12,7 +12,7 @@ public class Sample3 {
 		// TODO Auto-generated method stub
 		byte a = -5;   // 0101
 		printByte(a);
-		byte b = -5 >> 1;
+		byte b = -5 >> 1; 
 		printByte(b);
 		byte c = -5 >> 2;
 		printByte(c);
