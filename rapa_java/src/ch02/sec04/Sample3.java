@@ -19,7 +19,7 @@ public class Sample3 {
 //
 //		byte d = a << 3;
 //		printByte(d);
-//		
+//		1000 0011 2
 		byte e = 5 >>> 2;
 		printByte(e);
 
