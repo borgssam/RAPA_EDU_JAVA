@@ -1,0 +1,146 @@
+package ch20.mysql.sec11;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Scanner;
+
+public class BoardExample {
+	private Scanner scanner = new Scanner(System.in);
+	private Connection conn;
+	public BoardExample() {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+		
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sf"
+					,"root","1234");
+            conn.setAutoCommit(true);
+		} catch(Exception e) {
+			e.printStackTrace();exit();
+		}
+		finally {}
+	}
+	
+	public void boardlist() {
+//		[게시판 목록]
+//		--------------------------------------
+//		no   writer     date          title
+//		1    홍길동  2014-12-01    환영합니다.
+		System.out.println();
+		System.out.println("[게시판 목록]");
+		System.out.println("---------------------------------------------------");
+		System.out.printf("%-6s%-12s%-16s%-40s\n","no","writer","date","title");
+		System.out.println("---------------------------------------------------");
+		
+//		System.out.printf("%-6s%-12s%-16s%-40s\n","1","사자","2020-10-11","환영합니다.");
+		//board목록읽어오기
+		try {
+			String sql = "SELECT bno, btitle, bcontent, bwriter, bdate FROM boards; ";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()) {
+				Board board = new Board();
+				board.setBno(rs.getInt("bno"));
+				board.setBtitle(rs.getString("btitle"));
+				board.setBcontent(rs.getString("bcontent"));
+				board.setBwriter(rs.getString("bwriter"));
+				board.setBdate(rs.getDate("bdate"));
+
+				System.out.printf("%-6s%-12s%-16s%-40s\n"
+						,board.getBno()
+						,board.getBwriter()
+						,board.getBdate()
+						,board.getBtitle()						
+						);
+			}
+			rs.close();
+			pstmt.close();
+			
+		} catch(Exception e) {
+			
+		} finally {
+		}
+		
+		
+		mainMenu();
+	}
+	
+	public void mainMenu() {
+		System.out.println();
+		System.out.println("------------------------------------------------");
+		System.out.println("[메인메뉴] 1.생성 | 2.읽기 | 3.지우기 | 4.종료");
+		System.out.print("메뉴선택: ");
+		String menuNo = scanner.nextLine();
+		//System.out.println("선택된메뉴번호:"+ menuNo);
+		switch(menuNo) {
+		case "1":
+			create();
+			break;
+		case "2":
+			read();
+			break;
+		case "3":
+			clear();
+			break;
+		case "4":
+			exit();
+			break;			
+		}			
+	}
+
+	private void create() {
+		System.out.println("게시물 생성실행.......................");
+		
+		//제목
+		//글쓴이
+		//날짜
+		//내용
+		Board board = new Board();
+		System.out.print("제목:");
+		board.setBtitle(scanner.nextLine());
+		System.out.print("글쓴이:");
+		board.setBwriter(scanner.nextLine());
+		System.out.print("내용:");
+		board.setBcontent(scanner.nextLine());
+		//db에 저장하기
+		try {
+			String sql = "insert into boards(btitle, bwriter, bcontent, bdate)"
+					+ "values(?,?,?,now());";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1,  board.getBtitle());
+			pstmt.setString(2,  board.getBwriter());
+			pstmt.setString(3,  board.getBcontent());
+			pstmt.executeUpdate();
+			pstmt.close();			
+			
+		}catch(Exception e) {
+			
+		}finally {
+//			conn.close();
+		}
+		
+		boardlist();
+	}
+	private void read() {
+		System.out.println("읽기실행.......................");
+		boardlist();
+		
+	}
+	private void clear() {
+		System.out.println("지우기실행........................");
+		boardlist();
+		
+	}
+	
+	private void exit() {
+		System.exit(0);
+		
+	}
+	
+	public static void main(String[] args) {
+		BoardExample bde = new BoardExample();
+		bde.boardlist();
+	}
+
+}
