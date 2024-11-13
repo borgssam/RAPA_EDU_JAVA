@@ -124,11 +124,65 @@ public class BoardExample {
 	}
 	private void read() {
 		System.out.println("읽기실행.......................");
+		System.out.print("bno:");
+		String temp = scanner.nextLine();
+		int bno = Integer.parseInt(temp);
+		try {
+			String sql = "SELECT bno, btitle, bcontent, bwriter, bdate FROM boards WHERE bno = ?; ";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, bno);
+			
+			ResultSet rs = pstmt.executeQuery();
+			if(rs.next()) {
+				System.out.println("#################");
+				System.out.println("번호:"+rs.getInt("bno"));
+				System.out.println("제목:"+rs.getString("btitle"));
+				System.out.println("내용:"+rs.getString("bcontent"));
+				System.out.println("작성자:"+rs.getString("bwriter"));
+				System.out.println("날짜:"+rs.getDate("bdate"));
+				System.out.println("#################");
+				
+			} else {
+				System.out.printf("게시판 번호 %d는 자료가 없습니다. \n",bno);				
+			}
+			
+			System.out.println("계속하시려면 아무키나 누르세요....");
+			String _tempo = scanner.nextLine();
+		} catch(Exception e) {
+			
+		} finally {
+			
+		}
+		
 		boardlist();
 		
 	}
 	private void clear() {
 		System.out.println("지우기실행........................");
+		System.out.print("bno:");
+		String temp = scanner.nextLine();
+		int bno = Integer.parseInt(temp);
+		try {
+			String sql = "delete from boards WHERE bno = ?; ";
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, bno);
+			
+			int rows = pstmt.executeUpdate();
+			if(rows>0) {
+				System.out.println("삭제성공3");	
+			
+			} else {
+				System.out.println("삭제실패");				
+			}
+			
+			System.out.println("계속하시려면 아무키나 누르세요....");
+			String _tempo = scanner.nextLine();
+		} catch(Exception e) {
+			
+		} finally {
+			
+		}
+		
 		boardlist();
 		
 	}
